@@ -961,7 +961,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore] // TODO: Figure out how to handle that "with_escape" differs
     fn can_parse_embed_as_with_prototypes() {
         let old_def = SyntaxDefinition::load_from_str(r#"
         name: C
@@ -982,7 +981,7 @@ mod tests {
                   pop: true
         "#,false, None).unwrap();
 
-        let def_with_embed = SyntaxDefinition::load_from_str(r#"
+        let mut def_with_embed = SyntaxDefinition::load_from_str(r#"
         name: C
         scope: source.c
         file_extensions: [c, h]
@@ -997,6 +996,23 @@ mod tests {
               embed_scope: source.css.embedded.html
               escape: (?i)(?=</style)
         "#,false, None).unwrap();
+
+        let def_with_embed_context = def_with_embed.contexts.get_mut("main").unwrap();
+        if let Pattern::Match(ref mut match_pattern) = def_with_embed_context.patterns[0] {
+            if let MatchOperation::Push(ref mut context_references) = match_pattern.operation {
+                if let ContextReference::ByScope {
+                    ref mut with_escape,
+                    ..
+                } = context_references[1]
+                {
+                    // Adjust this to be the same. We don't care that they are
+                    // different, because that only matters when the embedded
+                    // scope does not exist, which is not relevant for the test
+                    // we are in
+                    *with_escape = false;
+                }
+            }
+        }
 
         assert_eq!(old_def.contexts["main"], def_with_embed.contexts["main"]);
     }
