@@ -949,6 +949,35 @@ mod tests {
     }
 
     #[test]
+    fn falls_back_to_plain_text_when_embedded_scope_is_missing() {
+        let syntax_z = SyntaxDefinition::load_from_str(r#"
+        name: Z
+        scope: source.z
+        file_extensions: [z]
+        contexts:
+          main:
+            - match: 'z'
+              scope: z
+            - match: 'go_x'
+              embed: scope:does.not.exist
+              escape: 'leave_x'
+        "#, true, None).unwrap();
+
+        let mut builder = SyntaxSetBuilder::new();
+        builder.add_plain_text_syntax();
+        builder.add(syntax_z);
+        let syntax_set = builder.build();
+
+        let syntax = syntax_set.find_syntax_by_extension("z").unwrap();
+        let mut parse_state = ParseState::new(syntax);
+        let ops = parse_state.parse_line("z go_x x leave_x z", &syntax_set);
+        let expected_text_plain = (6, ScopeStackOp::Push(Scope::new("text.plain").unwrap()));
+        assert_ops_contain(&ops, &expected_text_plain);
+        let expected_text_plain_pop = (9, ScopeStackOp::Pop(1));
+        assert_ops_contain(&ops, &expected_text_plain_pop);
+    }
+
+    #[test]
     fn can_find_unlinked_contexts() {
         let syntax_set = {
             let mut builder = SyntaxSetBuilder::new();
