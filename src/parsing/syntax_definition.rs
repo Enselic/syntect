@@ -108,6 +108,9 @@ pub enum ContextReference {
     ByScope {
         scope: Scope,
         sub_context: Option<String>,
+        /// If this reference by scope is part of an `embed` for which there is an `escape`.
+        /// In other words a reference for a context for which there "always is a way out".
+        with_escape: bool,
     },
     File {
         name: String,

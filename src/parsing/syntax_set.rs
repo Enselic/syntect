@@ -730,8 +730,22 @@ impl SyntaxSetBuilder {
             ByScope {
                 scope,
                 ref sub_context,
+                with_escape,
             } => Self::find_id(sub_context, all_context_ids, syntaxes, |index_and_syntax| {
                 index_and_syntax.1.scope == scope
+            })
+            .or_else(|| {
+                if with_escape {
+                    // If we keep this reference unresolved, syntect will crash when it encounters
+                    // the reference. Rather than crashing, we instead fall back to "Plain Text".
+                    // This seems to be how Sublime Text behaves. It should be a safe thing to do since
+                    // `embed`s always includes an `escape` to get out of the `embed`.
+                    Self::find_id(sub_context, all_context_ids, syntaxes, |index_and_syntax| {
+                        index_and_syntax.1.name == "Plain Text"
+                    })
+                } else {
+                    None
+                }
             }),
             File {
                 ref name,
@@ -954,7 +968,7 @@ mod tests {
 
         let unlinked_contexts : Vec<String> = syntax_set.find_unlinked_contexts().into_iter().collect();
         assert_eq!(unlinked_contexts.len(), 1);
-        assert_eq!(unlinked_contexts[0], "Syntax 'A' with scope 'source.a' has unresolved context reference ByScope { scope: <source.b>, sub_context: Some(\"main\") }");
+        assert_eq!(unlinked_contexts[0], "Syntax 'A' with scope 'source.a' has unresolved context reference ByScope { scope: <source.b>, sub_context: Some(\"main\"), with_escape: false }");
     }
 
     #[test]
