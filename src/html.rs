@@ -401,7 +401,7 @@ pub fn styled_line_to_highlighted_html(v: &[(Style, &str)], bg: IncludeBackgroun
 pub fn append_highlighted_html_for_styled_line(
     v: &[(Style, &str)],
     bg: IncludeBackground,
-    mut s: &mut String,
+    s: &mut String,
 ) {
     let mut prev_style: Option<&Style> = None;
     for &(ref style, text) in v.iter() {
@@ -425,7 +425,7 @@ pub fn append_highlighted_html_for_styled_line(
             };
             if include_bg {
                 write!(s, "background-color:").unwrap();
-                write_css_color(&mut s, style.background);
+                write_css_color(s, style.background);
                 write!(s, ";").unwrap();
             }
             if style.font_style.contains(FontStyle::UNDERLINE) {
@@ -438,7 +438,7 @@ pub fn append_highlighted_html_for_styled_line(
                 write!(s, "font-style:italic;").unwrap();
             }
             write!(s, "color:").unwrap();
-            write_css_color(&mut s, style.foreground);
+            write_css_color(s, style.foreground);
             write!(s, ";\">{}", Escape(text)).unwrap();
         }
     }
