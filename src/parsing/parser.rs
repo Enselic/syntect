@@ -524,7 +524,7 @@ impl ParseState {
         match_op: &MatchOperation,
         syntax_set: &'a SyntaxSet,
         ops: &mut Vec<(usize, ScopeStackOp)>,
-    ) {
+    ) -> Result<(), ParsingError>{
         // println!("metas ops for {:?}, initial: {}",
         //          match_op,
         //          initial);
