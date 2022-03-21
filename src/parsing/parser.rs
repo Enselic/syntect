@@ -300,7 +300,7 @@ impl ParseState {
                 // check the next "pop" for loops. Otherwise leave the state,
                 // e.g. non-consuming "set" could also result in a loop.
                 let context = reg_match.context;
-                let match_pattern = context.match_at(reg_match.pat_index);
+                let match_pattern = context.match_at(reg_match.pat_index)?;
                 if let MatchOperation::Push(_) = match_pattern.operation {
                     *non_consuming_push_at = (match_end, self.stack.len() + 1);
                 }
@@ -362,7 +362,7 @@ impl ParseState {
 
         for (from_with_proto, ctx, captures) in context_chain {
             for (pat_context, pat_index) in context_iter(syntax_set, syntax_set.get_context(ctx)?) {
-                let match_pat = pat_context.match_at(pat_index);
+                let match_pat = pat_context.match_at(pat_index)?;
 
                 if let Some(match_region) = self.search(
                     line, start, match_pat, captures, search_cache, regions
@@ -405,6 +405,7 @@ impl ParseState {
         Ok(best_match)
     }
 
+    // TODO: Return Result
     fn search(&self,
               line: &str,
               start: usize,
@@ -475,10 +476,10 @@ impl ParseState {
     ) -> Result<bool, ParsingError> {
         let (match_start, match_end) = reg_match.regions.pos(0).unwrap();
         let context = reg_match.context;
-        let pat = context.match_at(reg_match.pat_index);
+        let pat = context.match_at(reg_match.pat_index)?;
         // println!("running pattern {:?} on '{}' at {}, operation {:?}", pat.regex_str, line, match_start, pat.operation);
 
-        self.push_meta_ops(true, match_start, level_context, &pat.operation, syntax_set, ops);
+        self.push_meta_ops(true, match_start, level_context, &pat.operation, syntax_set, ops)?;
         for s in &pat.scope {
             // println!("pushing {:?} at {}", s, match_start);
             ops.push((match_start, ScopeStackOp::Push(*s)));
@@ -511,7 +512,7 @@ impl ParseState {
             // println!("popping at {}", match_end);
             ops.push((match_end, ScopeStackOp::Pop(pat.scope.len())));
         }
-        self.push_meta_ops(false, match_end, &*level_context, &pat.operation, syntax_set, ops);
+        self.push_meta_ops(false, match_end, &*level_context, &pat.operation, syntax_set, ops)?;
 
         self.perform_op(line, &reg_match.regions, pat, syntax_set)
     }
@@ -542,7 +543,7 @@ impl ParseState {
 
                 // cleared scopes are restored after the scopes from match pattern that invoked the pop are applied
                 if !initial && cur_context.clear_scopes != None {
-                    ops.push((index, ScopeStackOp::Restore));
+                    ops.push((index, ScopeStackOp::Restore))
                 }
             },
             // for some reason the ST3 behaviour of set is convoluted and is inconsistent with the docs and other ops
