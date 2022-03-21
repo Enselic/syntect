@@ -29,6 +29,8 @@ pub enum ParsingError {
     /// syntax that is not known to syntect. See e.g. <https://github.com/trishume/syntect/issues/421>
     #[error("Missing context with ID '{0:?}'")]
     MissingContext(ContextId),
+    #[error("bad index to match_at: {0}")]
+    BadMatchIndex(usize),
 }
 
 /// Keeps the current parser state (the internal syntax interpreter stack) between lines of parsing.

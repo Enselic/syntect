@@ -196,7 +196,7 @@ impl Context {
     pub fn match_at(&self, index: usize) -> Result<&MatchPattern, ParsingError> {
         match self.patterns[index] {
             Pattern::Match(ref match_pat) => Ok(match_pat),
-            _ => panic!("bad index to match_at"), // TODO
+            _ => Err(ParsingError::BadMatchIndex(index)),
         }
     }
 }
