@@ -206,15 +206,15 @@ impl ContextReference {
     pub fn resolve<'a>(&self, syntax_set: &'a SyntaxSet) -> Result<&'a Context, ParsingError> {
         match *self {
             ContextReference::Direct(ref context_id) => syntax_set.get_context(context_id),
-            _ => panic!("Can only call resolve on linked references: {:?}", self), // TODO
+            _ => Err(ParsingError::UnresolvedContextReference(self.clone())),
         }
     }
 
     /// get the context ID this reference points to, panics if ref is not linked
-    pub fn id(&self) -> ContextId {
+    pub fn id(&self) -> Result<ContextId, ParsingError> {
         match *self {
-            ContextReference::Direct(ref context_id) => *context_id,
-            _ => panic!("Can only get ContextId of linked references: {:?}", self),
+            ContextReference::Direct(ref context_id) => Ok(*context_id),
+             _ => Err(ParsingError::UnresolvedContextReference(self.clone())),
         }
     }
 }

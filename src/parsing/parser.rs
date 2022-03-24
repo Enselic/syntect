@@ -31,6 +31,8 @@ pub enum ParsingError {
     MissingContext(ContextId),
     #[error("bad index to match_at: {0}")]
     BadMatchIndex(usize),
+    #[error("Tried to use a ContextReference that has not bee resolved yet: {0:?}")]
+    UnresolvedContextReference(ContextReference),
 }
 
 /// Keeps the current parser state (the internal syntax interpreter stack) between lines of parsing.
@@ -563,7 +565,7 @@ impl ParseState {
                     }
                     // add each context's meta scope
                     for r in context_refs.iter() {
-                        let ctx = r.resolve(syntax_set);
+                        let ctx = r.resolve(syntax_set)?;
 
                         if !is_set {
                             if let Some(clear_amount) = ctx.clear_scopes {
@@ -577,14 +579,14 @@ impl ParseState {
                     }
                 } else {
                     let repush = (is_set && (!cur_context.meta_scope.is_empty() || !cur_context.meta_content_scope.is_empty())) || context_refs.iter().any(|r| {
-                        let ctx = r.resolve(syntax_set);
+                        let ctx = r.resolve(syntax_set).unwrap(); // TODO: Propagate out from .any()
 
                         !ctx.meta_content_scope.is_empty() || (ctx.clear_scopes.is_some() && is_set)
                     });
                     if repush {
                         // remove previously pushed meta scopes, so that meta content scopes will be applied in the correct order
                         let mut num_to_pop : usize = context_refs.iter().map(|r| {
-                            let ctx = r.resolve(syntax_set);
+                            let ctx = r.resolve(syntax_set).unwrap(); // TODO: Propagate out from .map()
                             ctx.meta_scope.len()
                         }).sum();
 
@@ -600,7 +602,7 @@ impl ParseState {
 
                         // now we push meta scope and meta context scope for each context pushed
                         for r in context_refs {
-                            let ctx = r.resolve(syntax_set);
+                            let ctx = r.resolve(syntax_set)?;
 
                             // for some reason, contrary to my reading of the docs, set does this after the token
                             if is_set {
@@ -621,6 +623,8 @@ impl ParseState {
             },
             MatchOperation::None => (),
         }
+
+        Ok(())
     }
 
     /// Returns true if the stack was changed
@@ -660,10 +664,10 @@ impl ParseState {
                 // referred to as the "target" of the push by sublimehq - see
                 // https://forum.sublimetext.com/t/dev-build-3111/19240/17 for more info
                 if let Some(ref p) = pat.with_prototype {
-                    proto_ids.push(p.id());
+                    proto_ids.push(p.id()?);
                 }
             }
-            let context_id = r.id();
+            let context_id = r.id()?;
             let context = syntax_set.get_context(&context_id)?;
             let captures = {
                 let mut uses_backrefs = context.uses_backrefs;
