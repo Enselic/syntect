@@ -219,6 +219,7 @@ impl Scope {
     /// I can't think of any reason you'd find this useful. It is used internally for turning a
     /// scope back into a string.
     pub fn atom_at(self, index: usize) -> u16 {
+        #[allow(clippy::panic)] // Not worth propagating
         let shifted = if index < 4 {
             self.a >> ((3 - index) * 16)
         } else if index < 8 {
