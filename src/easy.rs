@@ -298,7 +298,7 @@ mod tests {
         let mut stack = ScopeStack::new();
         let mut token_count = 0;
         for (s, op) in ScopeRegionIterator::new(&ops, line) {
-            stack.apply(op);
+            stack.apply(op).expect("#[cfg(test)]");
             if s.is_empty() { // in this case we don't care about blank tokens
                 continue;
             }
