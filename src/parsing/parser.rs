@@ -33,6 +33,8 @@ pub enum ParsingError {
     BadMatchIndex(usize),
     #[error("Tried to use a ContextReference that has not bee resolved yet: {0:?}")]
     UnresolvedContextReference(ContextReference),
+    #[error("tried to restore cleared scopes, but none were cleared")]
+    NoClearedScopesToRestore,
 }
 
 /// Keeps the current parser state (the internal syntax interpreter stack) between lines of parsing.

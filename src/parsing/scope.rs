@@ -11,6 +11,8 @@ use std::mem;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Visitor};
 
+use super::ParsingError;
+
 /// Multiplier on the power of 2 for MatchPower. This is only useful if you compute your own
 /// [`MatchPower`] scores
 ///
@@ -399,7 +401,7 @@ impl ScopeStack {
     /// Modifies this stack according to the operation given
     ///
     /// Use this to create a stack from a `Vec` of changes given by the parser.
-    pub fn apply(&mut self, op: &ScopeStackOp) {
+    pub fn apply(&mut self, op: &ScopeStackOp) -> Result<(), ParsingError> {
         self.apply_with_hook(op, |_,_|{})
     }
 
@@ -411,7 +413,7 @@ impl ScopeStack {
     /// [`apply`]: #method.apply
     /// [`BasicScopeStackOp`]: enum.BasicScopeStackOp.html
     #[inline]
-    pub fn apply_with_hook<F>(&mut self, op: &ScopeStackOp, mut hook: F)
+    pub fn apply_with_hook<F>(&mut self, op: &ScopeStackOp, mut hook: F) -> Result<(), ParsingError>
         where F: FnMut(BasicScopeStackOp, &[Scope])
     {
         match *op {
@@ -452,11 +454,13 @@ impl ScopeStack {
                             hook(BasicScopeStackOp::Push(*s), self.as_slice());
                         }
                     }
-                    None => panic!("tried to restore cleared scopes, but none were cleared"),
+                    None => return Err(ParsingError::NoClearedScopesToRestore),
                 }
             }
             ScopeStackOp::Noop => (),
         }
+        
+        Ok(())
     }
 
     /// Prints out each scope in the stack separated by spaces
