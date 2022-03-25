@@ -128,11 +128,11 @@ impl<'a> ClassedHTMLGenerator<'a> {
 
 #[deprecated(since="4.2.0", note="Please use `css_for_theme_with_class_style` instead.")]
 pub fn css_for_theme(theme: &Theme) -> String {
-    css_for_theme_with_class_style(theme, ClassStyle::Spaced)
+    css_for_theme_with_class_style(theme, ClassStyle::Spaced).expect("Please use `css_for_theme_with_class_style` instead.")
 }
 
 /// Create a complete CSS for a given theme. Can be used inline, or written to a CSS file.
-pub fn css_for_theme_with_class_style(theme: &Theme, style: ClassStyle) -> String {
+pub fn css_for_theme_with_class_style(theme: &Theme, style: ClassStyle) -> Result<String, Error> {
     let mut css = String::new();
 
     css.push_str("/*\n");
@@ -349,7 +349,7 @@ pub fn line_tokens_to_classed_spans(
     for &(i, ref op) in ops {
         if i > cur_index {
             span_empty = false;
-            write!(s, "{}", Escape(&line[cur_index..i])).unwrap();
+            write!(s, "{}", Escape(&line[cur_index..i]))?;
             cur_index = i
         }
         stack.apply_with_hook(op, |basic_op, _| match basic_op {
