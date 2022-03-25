@@ -326,7 +326,7 @@ mod tests {
 
             let mut iterated_ops: Vec<&ScopeStackOp> = Vec::new();
             for (_, op) in ScopeRegionIterator::new(&ops, line) {
-                stack.apply(op);
+                stack.apply(op).expect("#[cfg(test)]");
                 iterated_ops.push(op);
                 println!("{:?}", op);
             }

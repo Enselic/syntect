@@ -779,7 +779,7 @@ mod tests {
 
         let mut stack = ScopeStack::new();
         for &(_, ref op) in ops.iter() {
-            stack.apply(op);
+            stack.apply(op).expect("#[cfg(test)]");
         }
         assert_eq!(stack, test_stack);
     }
@@ -1836,7 +1836,7 @@ contexts:
         let mut states = Vec::new();
         let mut stack = ScopeStack::new();
         for &(_, ref op) in ops.iter() {
-            stack.apply(op);
+            stack.apply(op).expect("#[cfg(test)]");
             let scopes: Vec<String> = stack.as_slice().iter().map(|s| format!("{:?}", s)).collect();
             let stack_str = scopes.join(", ");
             states.push(stack_str);
