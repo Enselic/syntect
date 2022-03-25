@@ -411,7 +411,6 @@ impl ParseState {
         Ok(best_match)
     }
 
-    // TODO: Return Result
     fn search(&self,
               line: &str,
               start: usize,

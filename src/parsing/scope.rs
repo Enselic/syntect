@@ -459,7 +459,7 @@ impl ScopeStack {
             }
             ScopeStackOp::Noop => (),
         }
-        
+
         Ok(())
     }
 
