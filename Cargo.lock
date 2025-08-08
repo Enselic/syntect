@@ -785,13 +785,12 @@ dependencies = [
 [[package]]
 name = "public-api"
 version = "0.50.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb5d6a6896b49665a84f227c84d30d56faa526915a675261e9beb877c1b0444c"
 dependencies = [
  "hashbag",
  "rustdoc-types",
  "serde",
  "serde_json",
+ "snapshot-testing",
  "thiserror 2.0.12",
 ]
 
@@ -1004,10 +1003,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1de1d4f81173b03af4c0cbed3c898f6bff5b870e4a7f5d6f4057d62a7a4b686e"
 
 [[package]]
+name = "similar-asserts"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5b441962c817e33508847a22bd82f03a30cff43642dc2fae8b050566121eb9a"
+dependencies = [
+ "console",
+ "similar",
+]
+
+[[package]]
 name = "smallvec"
 version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
+
+[[package]]
+name = "snapshot-testing"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b56694a2f85c6036af4dd73eb05e6d4f966eea582b7b6db9fedfe8e7c7e48a3"
+dependencies = [
+ "similar-asserts",
+]
 
 [[package]]
 name = "stable_deref_trait"
