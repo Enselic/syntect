@@ -539,18 +539,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "insta"
-version = "1.42.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6513e4067e16e69ed1db5ab56048ed65db32d10ba5fc1217f5393f8f17d8b5a5"
-dependencies = [
- "console",
- "linked-hash-map",
- "once_cell",
- "similar",
-]
-
-[[package]]
 name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1021,9 +1009,8 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 [[package]]
 name = "snapshot-testing"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b56694a2f85c6036af4dd73eb05e6d4f966eea582b7b6db9fedfe8e7c7e48a3"
 dependencies = [
+ "console",
  "similar-asserts",
 ]
 
@@ -1076,7 +1063,6 @@ dependencies = [
  "flate2",
  "fnv",
  "getopts",
- "insta",
  "once_cell",
  "onig",
  "plist",
